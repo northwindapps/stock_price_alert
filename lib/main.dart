@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'dart:io';
 
 void callbackDispatcher() {
   print("called");
@@ -19,12 +20,27 @@ void callbackDispatcher() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Workmanager().initialize(
-      callbackDispatcher, // The top level function, aka callbackDispatcher
-      isInDebugMode:
-          true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
-      );
-  await Workmanager().registerOneOffTask("task-identifier", "simpleTask");
+  if (Platform.isIOS) {
+    // Code for iOS
+    print("Running on iOS");
+  } else if (Platform.isAndroid) {
+    await Workmanager().initialize(
+        callbackDispatcher, // The top level function, aka callbackDispatcher
+        isInDebugMode:
+            true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+        );
+    Workmanager().registerOneOffTask(
+        "com.yumiya.mytask", "this part to be ignored in ios", // Ignored on iOS
+        initialDelay: Duration(minutes: 15),
+        inputData: null // fully supported
+        );
+    // Code for Android
+    print("Running on Android");
+  } else {
+    // Code for other platforms (unlikely in Flutter)
+    print("Running on another platform");
+  }
+
   //make sure you turned on wifi connection
   await Firebase.initializeApp();
   FirebaseMessaging.instance.requestPermission();
