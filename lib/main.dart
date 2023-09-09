@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:background_fetch/background_fetch.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -26,11 +27,13 @@ Future<void> initNotifications() async {
   final AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings(
           'app_icon'); // Replace 'app_icon' with your app's launcher icon
+
   final DarwinInitializationSettings initializationSettingsIOS =
       DarwinInitializationSettings(
           requestAlertPermission: true,
           requestBadgePermission: true,
           requestSoundPermission: true,
+          defaultPresentSound: true,
           onDidReceiveLocalNotification:
               (int id, String? title, String? body, String? payload) async {
             // Handle when a notification is tapped while the app is in the foreground.
@@ -41,7 +44,8 @@ Future<void> initNotifications() async {
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 }
 
-Future<void> showNotification() async {
+Future<void> showNotification(
+    String notificationTitle, String notificationBody) async {
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
     'your_channel_id', // Replace with a unique channel ID
@@ -53,8 +57,8 @@ Future<void> showNotification() async {
 
   await flutterLocalNotificationsPlugin.show(
     0, // Notification ID (you can use different IDs for different notifications)
-    'Notification Title',
-    'Notification Body',
+    notificationTitle,
+    notificationBody,
     platformChannelSpecifics,
   );
 }
@@ -65,6 +69,36 @@ void main() async {
     // Code for iOS
     print("Running on iOS");
     await initNotifications();
+    // Step 1:  Configure BackgroundFetch as usual.
+    int status = await BackgroundFetch.configure(
+        BackgroundFetchConfig(
+          minimumFetchInterval: 15,
+          stopOnTerminate:
+              false, // Continue running background tasks even if the app is terminated
+          enableHeadless: true, // Enable headless mode
+          startOnBoot: true, // Start background fetch on device boot
+        ), (String taskId) async {
+      // <-- Event callback.
+      // This is the fetch-event callback.
+      print("[BackgroundFetch] taskId: $taskId");
+
+      // Use a switch statement to route task-handling.
+      switch (taskId) {
+        case 'com.yumiya.mytask':
+          print("Received custom task");
+          showNotification('hi', 'how are you?');
+          break;
+        default:
+          print("Default fetch task");
+      }
+      // Finish, providing received taskId.
+      BackgroundFetch.finish(taskId);
+    }, (String taskId) async {
+      // <-- Event timeout callback
+      // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)
+      print("[BackgroundFetch] TIMEOUT taskId: $taskId");
+      BackgroundFetch.finish(taskId);
+    });
   } else if (Platform.isAndroid) {
     await Workmanager().initialize(
         callbackDispatcher, // The top level function, aka callbackDispatcher
@@ -161,7 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
-    showNotification();
+    showNotification('important', 'actually it is not.');
   }
 
   @override
