@@ -4,6 +4,10 @@ import 'package:workmanager/workmanager.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'dart:io';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 void callbackDispatcher() {
   print("called");
@@ -18,11 +22,49 @@ void callbackDispatcher() {
   });
 }
 
+Future<void> initNotifications() async {
+  final AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings(
+          'app_icon'); // Replace 'app_icon' with your app's launcher icon
+  final DarwinInitializationSettings initializationSettingsIOS =
+      DarwinInitializationSettings(
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+          onDidReceiveLocalNotification:
+              (int id, String? title, String? body, String? payload) async {
+            // Handle when a notification is tapped while the app is in the foreground.
+          });
+
+  final InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+}
+
+Future<void> showNotification() async {
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+    'your_channel_id', // Replace with a unique channel ID
+    'Your channel name', // Replace with a descriptive channel name
+    //'Your channel description', // Replace with a descriptive channel description
+  );
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+
+  await flutterLocalNotificationsPlugin.show(
+    0, // Notification ID (you can use different IDs for different notifications)
+    'Notification Title',
+    'Notification Body',
+    platformChannelSpecifics,
+  );
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isIOS) {
     // Code for iOS
     print("Running on iOS");
+    await initNotifications();
   } else if (Platform.isAndroid) {
     await Workmanager().initialize(
         callbackDispatcher, // The top level function, aka callbackDispatcher
@@ -119,6 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+    showNotification();
   }
 
   @override
