@@ -7,6 +7,14 @@ import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:background_fetch/background_fetch.dart';
 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+
+  print("Handling a background message: ${message.messageId}");
+}
+
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
@@ -99,6 +107,11 @@ void main() async {
       print("[BackgroundFetch] TIMEOUT taskId: $taskId");
       BackgroundFetch.finish(taskId);
     });
+
+    // Step 2:  Schedule a custom "oneshot" task "com.transistorsoft.customtask" to execute 5000ms from now.
+    BackgroundFetch.scheduleTask(
+        TaskConfig(taskId: "com.yumiya.mytask", delay: 5000 // <-- milliseconds
+            ));
   } else if (Platform.isAndroid) {
     await Workmanager().initialize(
         callbackDispatcher, // The top level function, aka callbackDispatcher
@@ -137,6 +150,19 @@ void main() async {
   // await FirebaseMessaging.instance.setAutoInitEnabled(true);
   // final fcmToken = await FirebaseMessaging.instance.getToken();
   // print(fcmToken);
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.data}');
+
+    if (message.notification != null) {
+      print('Message also contained a notification: ${message.notification}');
+    }
+
+    showNotification('hi', 'how are you?');
+  });
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
 

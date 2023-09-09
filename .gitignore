@@ -44,7 +44,13 @@ app.*.map.json
 /android/app/release
 
 /android
-/ios
+/ios/flutter
+/ios/GoogleService-Info.plist
+/ios/Runner/GoogleService-Info.plist
+/ios/firebase_app_id_file.json
+/ios/Products
+/ios/RunnerTests
+/ios/Products/ios/Frameworks
 /windows
 /macos
 /linux
