@@ -23,13 +23,14 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 void callbackDispatcher() {
-  print("called");
   Workmanager().executeTask((task, inputData) async {
     switch (task) {
       case Workmanager.iOSBackgroundTask:
         print("The iOS background fetch was triggered");
         break;
     }
+    print("called");
+    // showNotification('hi', 'how are you?');
     bool success = true;
     return Future.value(success);
   });
@@ -122,11 +123,10 @@ void main() async {
         isInDebugMode:
             true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
         );
-    Workmanager().registerOneOffTask(
-        "com.yumiya.mytask", "this part to be ignored in ios", // Ignored on iOS
-        initialDelay: Duration(minutes: 15),
-        inputData: null // fully supported
-        );
+    Workmanager().registerPeriodicTask(
+      "com.yumiya.mytask", "this part to be ignored in ios", // Ignored on iOS
+      frequency: Duration(minutes: 5),
+    );
     // Code for Android
     print("Running on Android");
   } else {
@@ -135,7 +135,9 @@ void main() async {
   }
 
   //make sure you turned on wifi connection
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   FirebaseMessaging.instance.requestPermission();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   final fcmToken = await FirebaseMessaging.instance.getToken();
