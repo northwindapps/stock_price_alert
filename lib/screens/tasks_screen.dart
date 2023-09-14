@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stock_price_checker_app/main.dart';
 import 'package:stock_price_checker_app/widgets/tasks_list.dart';
 import 'package:stock_price_checker_app/screens/add_task_screen.dart';
 import 'package:provider/provider.dart';
@@ -32,14 +33,22 @@ class TasksScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                CircleAvatar(
-                  child: Icon(
-                    Icons.list,
-                    size: 30.0,
-                    color: Colors.lightBlueAccent,
+                GestureDetector(
+                  onTap: () async {
+                    // Your onPressed action code goes here
+                    // This function will be executed when the CircleAvatar is tapped
+                    print("CircleAvatar tapped");
+                    await showNotification('hi', 'how are you?');
+                  },
+                  child: CircleAvatar(
+                    child: Icon(
+                      Icons.list,
+                      size: 30.0,
+                      color: Colors.lightBlueAccent,
+                    ),
+                    backgroundColor: Colors.white,
+                    radius: 30.0,
                   ),
-                  backgroundColor: Colors.white,
-                  radius: 30.0,
                 ),
                 SizedBox(
                   height: 10.0,

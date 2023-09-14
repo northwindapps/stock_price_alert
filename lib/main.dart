@@ -15,7 +15,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp();
-
+  await showNotification('hi', 'how are you?');
   print("Handling a background message: ${message.messageId}");
 }
 
@@ -32,14 +32,29 @@ void callbackDispatcher() {
     print("called");
     // showNotification('hi', 'how are you?');
     bool success = true;
+    await showNotification('hi', 'how are you?');
     return Future.value(success);
   });
 }
 
+void onDidReceiveNotificationResponse(
+    NotificationResponse notificationResponse) async {
+  final String? payload = notificationResponse.payload;
+  if (notificationResponse.payload != null) {
+    debugPrint('notification payload: $payload');
+  }
+  // await Navigator.push(
+  //   context as BuildContext,
+  //   MaterialPageRoute<void>(builder: (context) => SecondScreen(payload)),
+  // );
+}
+// Handle when a notification is tapped while the app is in the foreground.
+
 Future<void> initNotifications() async {
-  final AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings(
-          'app_icon'); // Replace 'app_icon' with your app's launcher icon
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
   final DarwinInitializationSettings initializationSettingsIOS =
       DarwinInitializationSettings(
@@ -48,9 +63,7 @@ Future<void> initNotifications() async {
           requestSoundPermission: true,
           defaultPresentSound: true,
           onDidReceiveLocalNotification:
-              (int id, String? title, String? body, String? payload) async {
-            // Handle when a notification is tapped while the app is in the foreground.
-          });
+              (int id, String? title, String? body, String? payload) async {});
 
   final InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
@@ -61,19 +74,24 @@ Future<void> showNotification(
     String notificationTitle, String notificationBody) async {
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
-    'your_channel_id', // Replace with a unique channel ID
-    'Your channel name', // Replace with a descriptive channel name
-    //'Your channel description', // Replace with a descriptive channel description
-  );
+          'notification.id', // Replace with a unique channel ID
+          'general', // Replace with a descriptive channel name
+          channelDescription: 'description',
+          //'Your channel description', // Replace with a descriptive channel description
+          priority: Priority.max,
+          enableVibration: true,
+          icon: 'ic_launcher',
+          importance: Importance.high,
+          ticker: 'ticker');
   const NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
 
   await flutterLocalNotificationsPlugin.show(
-    0, // Notification ID (you can use different IDs for different notifications)
-    notificationTitle,
-    notificationBody,
-    platformChannelSpecifics,
-  );
+      0, // Notification ID (you can use different IDs for different notifications)
+      notificationTitle,
+      notificationBody,
+      platformChannelSpecifics,
+      payload: 'item x');
 }
 
 void main() async {
