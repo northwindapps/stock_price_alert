@@ -38,7 +38,7 @@ class TasksScreen extends StatelessWidget {
                     // Your onPressed action code goes here
                     // This function will be executed when the CircleAvatar is tapped
                     print("CircleAvatar tapped");
-                    await showNotification('hi', 'how are you?');
+                    await fetchData();
                   },
                   child: CircleAvatar(
                     child: Icon(

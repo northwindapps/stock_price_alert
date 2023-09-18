@@ -5,6 +5,8 @@
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.yumiya.mytask</string>
+		<string>com.transistorsoft.customtask</string>
+		<string>com.transistorsoft.fetch</string>
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
@@ -6,7 +7,7 @@ import 'firebase_options.dart';
 import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:background_fetch/background_fetch.dart';
-
+import 'package:http/http.dart' as http;
 import 'package:stock_price_checker_app/screens/tasks_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:stock_price_checker_app/models/task_data.dart';
@@ -16,6 +17,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp();
   await showNotification('hi', 'how are you?');
+  fetchData();
   print("Handling a background message: ${message.messageId}");
 }
 
@@ -33,6 +35,7 @@ void callbackDispatcher() {
     // showNotification('hi', 'how are you?');
     bool success = true;
     await showNotification('hi', 'how are you?');
+    fetchData();
     return Future.value(success);
   });
 }
@@ -184,10 +187,28 @@ void main() async {
     }
 
     showNotification('hi', 'how are you?');
+    fetchData();
   });
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(MyApp());
+}
+
+Future<void> fetchData() async {
+  final response = await http.get(Uri.parse(
+      'https://blsh-api.northwindsoftware.com/current_price?type=1&stock_name=microsoft'));
+
+  if (response.statusCode == 200) {
+    // If the server returns a 200 OK response, parse the JSON data
+    final jsonData = json.decode(response.body);
+    // You can now work with jsonData, which contains the response data
+    print(jsonData['current_value']);
+    showNotification('news', jsonData['current_value']);
+  } else {
+    // If the server did not return a 200 OK response,
+    // throw an exception or handle the error as needed
+    throw Exception('Failed to load data');
+  }
 }
 
 class MyApp extends StatelessWidget {
