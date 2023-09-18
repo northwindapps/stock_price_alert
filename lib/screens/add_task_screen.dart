@@ -32,7 +32,7 @@ class AddTaskScreen extends StatelessWidget {
           backgroundColor: MaterialStateProperty.all<Color>(
               Colors.lightBlueAccent), // Set your desired background color here
         ),
-        onPressed: () {
+        onPressed: () async {
           if (newTaskTitle != null) {
             Provider.of<TaskData>(context, listen: false)
                 .addTask(newTaskTitle!);
@@ -48,6 +48,8 @@ class AddTaskScreen extends StatelessWidget {
                   .setTitle('Choose one from them.');
               clearTextField();
               Navigator.pop(context);
+              Provider.of<TaskData>(context, listen: false)
+                  .saveTasksToStorage();
             }
           }
         },

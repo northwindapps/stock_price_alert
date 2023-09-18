@@ -19,15 +19,18 @@ class TaskData extends ChangeNotifier {
     final List<String>? taskStrings = prefs.getStringList('tasks');
 
     if (taskStrings != null) {
-      _tasks = taskStrings
-          .map(
-              (taskString) => Task.fromJson(taskString as Map<String, dynamic>))
+      List<Map<String, dynamic>> jsonData = taskStrings
+          .map((taskString) => json.decode(taskString))
+          .cast<Map<String, dynamic>>()
           .toList();
+      List names = jsonData.map((item) => item["name"]).toList();
+      _tasks.addAll(names.map((nameElement) => Task(name: nameElement)));
+      print(names);
       notifyListeners();
     }
   }
 
-  Future<void> _saveTasksToStorage() async {
+  Future<void> saveTasksToStorage() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final List<String> taskStrings = _tasks
         .map((task) => task.toJson())
