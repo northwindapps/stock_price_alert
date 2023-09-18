@@ -196,7 +196,7 @@ void main() async {
 
 Future<void> fetchData() async {
   final response = await http.get(Uri.parse(
-      'https://blsh-api.northwindsoftware.com/current_price?type=1&stock_name=microsoft'));
+      'https://example.com/current_price?type=1&stock_name=microsoft'));
 
   if (response.statusCode == 200) {
     // If the server returns a 200 OK response, parse the JSON data
