@@ -10,7 +10,7 @@ class AddTaskScreen extends StatelessWidget {
     String? newTaskTitle; // Make it nullable since it might be null
     final TextEditingController _controller = TextEditingController();
 
-    void _clearTextField() {
+    void clearTextField() {
       _controller.clear();
     }
 
@@ -40,12 +40,12 @@ class AddTaskScreen extends StatelessWidget {
               Provider.of<TaskData>(context, listen: false).addState();
               Provider.of<TaskData>(context, listen: false)
                   .setTitle('Set a lower limit price.');
-              _clearTextField();
+              clearTextField();
             } else if (state == 2) {
               Provider.of<TaskData>(context, listen: false).resetState();
               Provider.of<TaskData>(context, listen: false)
                   .setTitle('Choose one from them.');
-              _clearTextField();
+              clearTextField();
               Navigator.pop(context);
             }
           }

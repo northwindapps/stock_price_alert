@@ -1,15 +1,41 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:stock_price_checker_app/models/task.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:collection';
 
 class TaskData extends ChangeNotifier {
-  List<Task> _tasks = [
-    Task(name: 'Buy milk'),
-    Task(name: 'Buy eggs'),
-    Task(name: 'Buy bread'),
-  ];
-
+  List<Task> _tasks = [];
   int state = 0;
+
+  // Constructor
+  TaskData() {
+    _loadTasksFromStorage();
+  }
+
+  // Method to load tasks from shared storage
+  Future<void> _loadTasksFromStorage() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final List<String>? taskStrings = prefs.getStringList('tasks');
+
+    if (taskStrings != null) {
+      _tasks = taskStrings
+          .map(
+              (taskString) => Task.fromJson(taskString as Map<String, dynamic>))
+          .toList();
+      notifyListeners();
+    }
+  }
+
+  Future<void> _saveTasksToStorage() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final List<String> taskStrings = _tasks
+        .map((task) => task.toJson())
+        .toList()
+        .map((json) => jsonEncode(json))
+        .toList();
+    prefs.setStringList('tasks', taskStrings);
+  }
 
   String _displayText = 'Choose one from them.';
 

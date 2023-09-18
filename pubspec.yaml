@@ -42,6 +42,7 @@ dependencies:
   firebase_messaging: ^14.6.7
   background_fetch: ^1.2.1
   http: ^0.13.3    
+  shared_preferences: ^2.2.1
 
 
 dev_dependencies:
