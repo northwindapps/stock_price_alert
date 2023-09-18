@@ -4,11 +4,12 @@ import 'package:provider/provider.dart';
 import 'package:stock_price_checker_app/models/task_data.dart';
 
 class AddTaskScreen extends StatelessWidget {
+  static final TextEditingController _controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final state = Provider.of<TaskData>(context, listen: true).state;
     String? newTaskTitle; // Make it nullable since it might be null
-    final TextEditingController _controller = TextEditingController();
 
     void clearTextField() {
       _controller.clear();
@@ -81,8 +82,11 @@ class AddTaskScreen extends StatelessWidget {
                 color: Colors.lightBlueAccent,
               ),
             ),
-            state == 0
-                ? Column(
+            Column(
+              children: [
+                Visibility(
+                  visible: state == 0,
+                  child: Column(
                     children: [
                       RadioListTile<int>(
                         title: Text("Crypto"),
@@ -92,7 +96,7 @@ class AddTaskScreen extends StatelessWidget {
                           Provider.of<TaskData>(context, listen: false)
                               .addState();
                           Provider.of<TaskData>(context, listen: false)
-                              .setTitle('Enter a code.');
+                              .setTitle('Enter a crypto symbol.');
                         },
                       ),
                       RadioListTile<int>(
@@ -103,14 +107,24 @@ class AddTaskScreen extends StatelessWidget {
                           Provider.of<TaskData>(context, listen: false)
                               .addState();
                           Provider.of<TaskData>(context, listen: false)
-                              .setTitle('Enter a code.');
+                              .setTitle('Enter a stock symbol.');
                         },
                       ),
                     ],
-                  )
-                : SizedBox.shrink(),
-            (state == 1 || state == 2) ? buildTaskInput() : SizedBox.shrink(),
-            (state == 1 || state == 2) ? buildOkButton() : SizedBox.shrink(),
+                  ),
+                ),
+                Visibility(
+                  visible: state == 1 || state == 2,
+                  child: Column(
+                    children: [
+                      buildTaskInput(),
+                      buildOkButton()
+                      // Add your widgets for state 1 or 2 here
+                    ],
+                  ),
+                ),
+              ],
+            )
           ],
         ),
       ),
