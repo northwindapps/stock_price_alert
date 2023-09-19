@@ -24,8 +24,18 @@ class TaskData extends ChangeNotifier {
           .cast<Map<String, dynamic>>()
           .toList();
       List names = jsonData.map((item) => item["name"]).toList();
-      _tasks.addAll(names.map((nameElement) => Task(name: nameElement)));
-      print(names);
+      List lowerLimits = jsonData.map((item) => item["lowerLimit"]).toList();
+      List higherLimits = jsonData.map((item) => item["higherLimit"]).toList();
+
+      // Create a list of Task objects by mapping the data
+      List<Task> tasks = List.generate(names.length, (index) {
+        return Task(
+          name: names[index],
+          lowerLimit: lowerLimits[index],
+          higherLimit: higherLimits[index],
+        );
+      });
+      _tasks.addAll(tasks);
       notifyListeners();
     }
   }
@@ -56,11 +66,12 @@ class TaskData extends ChangeNotifier {
     _displayText = newTitle;
   }
 
-  void addTask(String newTaskTitle) {
+  void addTask(String newTaskTitle, String newLvalue, String newHvalue) {
     if (newTaskTitle == null) {
       print('String is null');
     } else {
-      final task = Task(name: newTaskTitle);
+      final task = Task(
+          name: newTaskTitle, lowerLimit: newLvalue, higherLimit: newHvalue);
       _tasks.add(task);
     }
 

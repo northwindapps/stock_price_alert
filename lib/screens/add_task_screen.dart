@@ -34,8 +34,8 @@ class AddTaskScreen extends StatelessWidget {
         ),
         onPressed: () async {
           if (newTaskTitle != null) {
-            Provider.of<TaskData>(context, listen: false)
-                .addTask(newTaskTitle!);
+            // Provider.of<TaskData>(context, listen: false)
+            //     .addTask(newTaskTitle!);
 
             if (state == 1) {
               Provider.of<TaskData>(context, listen: false).addState();
