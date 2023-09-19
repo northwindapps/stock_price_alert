@@ -64,7 +64,7 @@ Future<void> initNotifications() async {
           requestAlertPermission: true,
           requestBadgePermission: true,
           requestSoundPermission: true,
-          defaultPresentSound: true,
+          defaultPresentSound: false,
           onDidReceiveLocalNotification:
               (int id, String? title, String? body, String? payload) async {});
 
@@ -77,15 +77,18 @@ Future<void> showNotification(
     String notificationTitle, String notificationBody) async {
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
-          'notification.id', // Replace with a unique channel ID
-          'general', // Replace with a descriptive channel name
-          channelDescription: 'description',
-          //'Your channel description', // Replace with a descriptive channel description
-          priority: Priority.max,
-          enableVibration: true,
-          icon: 'ic_launcher',
-          importance: Importance.high,
-          ticker: 'ticker');
+    'notification.id', // Replace with a unique channel ID
+    'general', // Replace with a descriptive channel name
+    channelDescription: 'description',
+    //'Your channel description', // Replace with a descriptive channel description
+    priority: Priority.max,
+    enableVibration: true,
+    icon: 'ic_launcher',
+    importance: Importance.high,
+    ticker: 'ticker',
+    sound: RawResourceAndroidNotificationSound('dumpit'),
+    playSound: true,
+  );
   const NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
 
@@ -94,7 +97,7 @@ Future<void> showNotification(
       notificationTitle,
       notificationBody,
       platformChannelSpecifics,
-      payload: 'item x');
+      payload: 'dumpit');
 }
 
 void main() async {
