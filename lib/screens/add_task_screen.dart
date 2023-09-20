@@ -71,7 +71,7 @@ class AddTaskScreen extends StatelessWidget {
             Provider.of<TaskData>(context, listen: false).addState();
             Provider.of<TaskData>(context, listen: false)
                 .setTitle('Set a higher limit price.');
-            Provider.of<TaskData>(context, listen: true).item2 = newTaskBody!;
+            Provider.of<TaskData>(context, listen: false).item2 = newTaskBody!;
             // clearTextField();
           } else if (state == 3 && newTaskBody2 != null) {
             Provider.of<TaskData>(context, listen: false).resetState();

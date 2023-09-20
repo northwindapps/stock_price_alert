@@ -11,9 +11,10 @@ class TasksList extends StatelessWidget {
         return ListView.builder(
           itemBuilder: (context, index) {
             final task = taskData.tasks[index];
+            final text =
+                task.name + ' ' + task.lowerLimit + ' ' + task.higherLimit;
             return TaskTile(
-              taskTitle:
-                  task.name, // Non-nullable since task.name can't be null
+              taskTitle: text, // Non-nullable since task.name can't be null
               isChecked:
                   task.isDone, // Non-nullable since task.isDone can't be null
               checkboxCallback: (bool checkboxState) {
