@@ -38,13 +38,7 @@ class TasksList extends StatelessWidget {
                   ),
                 ],
               ),
-
-              isChecked:
-                  task.isDone, // Non-nullable since task.isDone can't be null
-              checkboxCallback: (bool checkboxState) {
-                // Annotated with bool
-                taskData.updateTask(task);
-              },
+              isChecked: false,
               longPressCallback: () {
                 // No need to specify a return type here
                 taskData.deleteTask(task);

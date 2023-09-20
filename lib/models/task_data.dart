@@ -51,6 +51,7 @@ class TaskData extends ChangeNotifier {
         .map((json) => jsonEncode(json))
         .toList();
     prefs.setStringList('tasks', taskStrings);
+    print(taskStrings);
   }
 
   String _displayText = 'Choose one from them.';
