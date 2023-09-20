@@ -66,19 +66,19 @@ class AddTaskScreen extends StatelessWidget {
             Provider.of<TaskData>(context, listen: false)
                 .setTitle('Set a lower limit price.');
             Provider.of<TaskData>(context, listen: false).item1 = newTaskTitle!;
-            // clearTextField();
+            clearTextField();
           } else if (state == 2 && newTaskBody != null) {
             Provider.of<TaskData>(context, listen: false).addState();
             Provider.of<TaskData>(context, listen: false)
                 .setTitle('Set a higher limit price.');
             Provider.of<TaskData>(context, listen: false).item2 = newTaskBody!;
-            // clearTextField();
+            clearTextField();
           } else if (state == 3 && newTaskBody2 != null) {
             Provider.of<TaskData>(context, listen: false).resetState();
             Provider.of<TaskData>(context, listen: false)
                 .setTitle('Choose one from them.');
             Provider.of<TaskData>(context, listen: false).item3 = newTaskBody2!;
-            // clearTextField();
+            clearTextField();
 
             newTaskTitle = Provider.of<TaskData>(context, listen: false).item1;
             newTaskBody = Provider.of<TaskData>(context, listen: false).item2;
@@ -88,8 +88,12 @@ class AddTaskScreen extends StatelessWidget {
 
             Provider.of<TaskData>(context, listen: false).saveTasksToStorage();
             Navigator.pop(context);
+          } else {
+            Provider.of<TaskData>(context, listen: false).state = 1;
+            newTaskBody = null;
+            newTaskTitle = null;
+            newTaskBody2 = null;
           }
-          // }
         },
         child: Text(
           'OK',

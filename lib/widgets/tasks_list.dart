@@ -11,8 +11,6 @@ class TasksList extends StatelessWidget {
         return ListView.builder(
           itemBuilder: (context, index) {
             final task = taskData.tasks[index];
-            final text =
-                task.name + ' ' + task.lowerLimit + ' ' + task.higherLimit;
             return TaskTile(
               taskTitle: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
