@@ -14,7 +14,33 @@ class TasksList extends StatelessWidget {
             final text =
                 task.name + ' ' + task.lowerLimit + ' ' + task.higherLimit;
             return TaskTile(
-              taskTitle: text, // Non-nullable since task.name can't be null
+              taskTitle: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    task.name,
+                    style: TextStyle(
+                      color: const Color.fromARGB(
+                          255, 71, 60, 60), // Change color as needed
+                    ),
+                  ),
+                  Text(
+                    task.lowerLimit,
+                    style: TextStyle(
+                      color: Color.fromARGB(
+                          255, 143, 197, 241), // Change color as needed
+                    ),
+                  ),
+                  Text(
+                    task.higherLimit,
+                    style: TextStyle(
+                      color: const Color.fromARGB(
+                          255, 255, 138, 130), // Change color as needed
+                    ),
+                  ),
+                ],
+              ),
+
               isChecked:
                   task.isDone, // Non-nullable since task.isDone can't be null
               checkboxCallback: (bool checkboxState) {
