@@ -4,24 +4,52 @@ import 'package:provider/provider.dart';
 import 'package:stock_price_checker_app/models/task_data.dart';
 
 class AddTaskScreen extends StatelessWidget {
-  static final TextEditingController _controller = TextEditingController();
+  static TextEditingController titleController = TextEditingController();
+  static TextEditingController bodyController = TextEditingController();
+  static TextEditingController body2Controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final state = Provider.of<TaskData>(context, listen: true).state;
-    String? newTaskTitle; // Make it nullable since it might be null
+    String? newTaskTitle;
+    String? newTaskBody;
+    String? newTaskBody2;
 
     void clearTextField() {
-      _controller.clear();
+      titleController.clear();
+      bodyController.clear();
+      body2Controller.clear();
     }
 
     Widget buildTaskInput() {
       return TextField(
-        controller: _controller,
+        controller: titleController,
         autofocus: true,
         textAlign: TextAlign.center,
         onChanged: (newText) {
           newTaskTitle = newText;
+        },
+      );
+    }
+
+    Widget buildTaskInput2() {
+      return TextField(
+        controller: bodyController,
+        autofocus: true,
+        textAlign: TextAlign.center,
+        onChanged: (newText) {
+          newTaskBody = newText;
+        },
+      );
+    }
+
+    Widget buildTaskInput3() {
+      return TextField(
+        controller: body2Controller,
+        autofocus: true,
+        textAlign: TextAlign.center,
+        onChanged: (newText) {
+          newTaskBody2 = newText;
         },
       );
     }
@@ -33,25 +61,35 @@ class AddTaskScreen extends StatelessWidget {
               Colors.lightBlueAccent), // Set your desired background color here
         ),
         onPressed: () async {
-          if (newTaskTitle != null) {
-            // Provider.of<TaskData>(context, listen: false)
-            //     .addTask(newTaskTitle!);
+          if (state == 1 && newTaskTitle != null) {
+            Provider.of<TaskData>(context, listen: false).addState();
+            Provider.of<TaskData>(context, listen: false)
+                .setTitle('Set a lower limit price.');
+            Provider.of<TaskData>(context, listen: false).item1 = newTaskTitle!;
+            // clearTextField();
+          } else if (state == 2 && newTaskBody != null) {
+            Provider.of<TaskData>(context, listen: false).addState();
+            Provider.of<TaskData>(context, listen: false)
+                .setTitle('Set a higher limit price.');
+            Provider.of<TaskData>(context, listen: true).item2 = newTaskBody!;
+            // clearTextField();
+          } else if (state == 3 && newTaskBody2 != null) {
+            Provider.of<TaskData>(context, listen: false).resetState();
+            Provider.of<TaskData>(context, listen: false)
+                .setTitle('Choose one from them.');
+            Provider.of<TaskData>(context, listen: false).item3 = newTaskBody2!;
+            // clearTextField();
 
-            if (state == 1) {
-              Provider.of<TaskData>(context, listen: false).addState();
-              Provider.of<TaskData>(context, listen: false)
-                  .setTitle('Set a lower limit price.');
-              clearTextField();
-            } else if (state == 2) {
-              Provider.of<TaskData>(context, listen: false).resetState();
-              Provider.of<TaskData>(context, listen: false)
-                  .setTitle('Choose one from them.');
-              clearTextField();
-              Navigator.pop(context);
-              Provider.of<TaskData>(context, listen: false)
-                  .saveTasksToStorage();
-            }
+            newTaskTitle = Provider.of<TaskData>(context, listen: false).item1;
+            newTaskBody = Provider.of<TaskData>(context, listen: false).item2;
+            newTaskBody2 = Provider.of<TaskData>(context, listen: false).item3;
+            Provider.of<TaskData>(context, listen: false)
+                .addTask(newTaskTitle!, newTaskBody!, newTaskBody2!);
+
+            Provider.of<TaskData>(context, listen: false).saveTasksToStorage();
+            Navigator.pop(context);
           }
+          // }
         },
         child: Text(
           'OK',
@@ -116,10 +154,30 @@ class AddTaskScreen extends StatelessWidget {
                   ),
                 ),
                 Visibility(
-                  visible: state == 1 || state == 2,
+                  visible: state == 1,
                   child: Column(
                     children: [
                       buildTaskInput(),
+                      buildOkButton()
+                      // Add your widgets for state 1 or 2 here
+                    ],
+                  ),
+                ),
+                Visibility(
+                  visible: state == 2,
+                  child: Column(
+                    children: [
+                      buildTaskInput2(),
+                      buildOkButton()
+                      // Add your widgets for state 1 or 2 here
+                    ],
+                  ),
+                ),
+                Visibility(
+                  visible: state == 3,
+                  child: Column(
+                    children: [
+                      buildTaskInput3(),
                       buildOkButton()
                       // Add your widgets for state 1 or 2 here
                     ],

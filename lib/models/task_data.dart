@@ -7,6 +7,9 @@ import 'dart:collection';
 class TaskData extends ChangeNotifier {
   List<Task> _tasks = [];
   int state = 0;
+  String item1 = '';
+  String item2 = '';
+  String item3 = '';
 
   // Constructor
   TaskData() {
@@ -73,6 +76,9 @@ class TaskData extends ChangeNotifier {
       final task = Task(
           name: newTaskTitle, lowerLimit: newLvalue, higherLimit: newHvalue);
       _tasks.add(task);
+      item1 = '';
+      item2 = '';
+      item3 = '';
     }
 
     displayText;
