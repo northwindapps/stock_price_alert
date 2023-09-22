@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stock_price_checker_app/main.dart';
 import 'package:stock_price_checker_app/widgets/tasks_list.dart';
 import 'package:stock_price_checker_app/screens/add_task_screen.dart';
@@ -39,7 +42,7 @@ class TasksScreen extends StatelessWidget {
                     // This function will be executed when the CircleAvatar is tapped
                     print("CircleAvatar tapped");
                     // await fetchData();
-                    await showNotification('hi', 'how are you');
+                    await fetchData();
                   },
                   child: CircleAvatar(
                     child: Icon(

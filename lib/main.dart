@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -11,12 +12,14 @@ import 'package:http/http.dart' as http;
 import 'package:stock_price_checker_app/screens/tasks_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:stock_price_checker_app/models/task_data.dart';
+import 'models/task.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp();
-  await showNotification('hi', 'how are you?');
+  await showNotification('hi', 'how are you?', true);
   fetchData();
   print("Handling a background message: ${message.messageId}");
 }
@@ -34,8 +37,8 @@ void callbackDispatcher() {
     print("called");
     // showNotification('hi', 'how are you?');
     bool success = true;
-    await showNotification('hi', 'how are you?');
-    fetchData();
+    // await showNotification('hi', 'how are you?');
+    await fetchData();
     return Future.value(success);
   });
 }
@@ -74,7 +77,7 @@ Future<void> initNotifications() async {
 }
 
 Future<void> showNotification(
-    String notificationTitle, String notificationBody) async {
+    String notificationTitle, String notificationBody, bool isDump) async {
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
     'notification.id', // Replace with a unique channel ID
@@ -97,11 +100,12 @@ Future<void> showNotification(
       notificationTitle,
       notificationBody,
       platformChannelSpecifics,
-      payload: 'dumpit');
+      payload: isDump ? 'dumpit' : 'pumpit');
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   if (Platform.isIOS) {
     // Code for iOS
     print("Running on iOS");
@@ -123,7 +127,7 @@ void main() async {
       switch (taskId) {
         case 'com.yumiya.mytask':
           print("Received custom task");
-          showNotification('hi', 'how are you?');
+          showNotification('hi', 'how are you?', false);
           break;
         default:
           print("Default fetch task");
@@ -149,7 +153,7 @@ void main() async {
         );
     Workmanager().registerPeriodicTask(
       "com.yumiya.mytask", "this part to be ignored in ios", // Ignored on iOS
-      frequency: Duration(minutes: 5),
+      frequency: Duration(minutes: 15),
     );
     // Code for Android
     print("Running on Android");
@@ -189,7 +193,7 @@ void main() async {
       print('Message also contained a notification: ${message.notification}');
     }
 
-    showNotification('hi', 'how are you?');
+    showNotification('hi', 'how are you?', false);
     fetchData();
   });
 
@@ -198,19 +202,35 @@ void main() async {
 }
 
 Future<void> fetchData() async {
-  final response = await http.get(Uri.parse(
-      'https://example.com/current_price?type=1&stock_name=microsoft'));
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final List<String>? taskStrings = prefs.getStringList('tasks');
 
-  if (response.statusCode == 200) {
-    // If the server returns a 200 OK response, parse the JSON data
-    final jsonData = json.decode(response.body);
-    // You can now work with jsonData, which contains the response data
-    print(jsonData['current_value']);
-    showNotification('news', jsonData['current_value']);
-  } else {
-    // If the server did not return a 200 OK response,
-    // throw an exception or handle the error as needed
-    throw Exception('Failed to load data');
+  if (taskStrings != null) {
+    List<Map<String, dynamic>> jsonData = taskStrings
+        .map((taskString) => json.decode(taskString))
+        .cast<Map<String, dynamic>>()
+        .toList();
+    List names = jsonData.map((item) => item["name"]).toList();
+    List lowerLimits = jsonData.map((item) => item["lowerLimit"]).toList();
+    List higherLimits = jsonData.map((item) => item["higherLimit"]).toList();
+    print(names);
+    for (var i = 0; i < names.length; i++) {
+      final response =
+          await http.get(Uri.parse("${dotenv.env['API_URL']}${names[i]}"));
+
+      if (response.statusCode == 200) {
+        // If the server returns a 200 OK response, parse the JSON data
+        final jsonData = json.decode(response.body);
+        // You can now work with jsonData, which contains the response data
+        print(jsonData['current_value']);
+        // showNotification('news', jsonData['current_value'], true);
+      } else {
+        // If the server did not return a 200 OK response,
+        // throw an exception or handle the error as needed
+        throw Exception('Failed to load data');
+      }
+      await Future.delayed(Duration(seconds: 10));
+    }
   }
 }
 
