@@ -12,8 +12,8 @@ import 'package:http/http.dart' as http;
 import 'package:stock_price_checker_app/screens/tasks_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:stock_price_checker_app/models/task_data.dart';
-import 'models/task.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'models/task.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
@@ -78,21 +78,41 @@ Future<void> initNotifications() async {
 
 Future<void> showNotification(
     String notificationTitle, String notificationBody, bool isDump) async {
-  const AndroidNotificationDetails androidPlatformChannelSpecifics =
-      AndroidNotificationDetails(
-    'notification.id', // Replace with a unique channel ID
-    'general', // Replace with a descriptive channel name
-    channelDescription: 'description',
-    //'Your channel description', // Replace with a descriptive channel description
-    priority: Priority.max,
-    enableVibration: true,
-    icon: 'ic_launcher',
-    importance: Importance.high,
-    ticker: 'ticker',
-    sound: RawResourceAndroidNotificationSound('dumpit'),
-    playSound: true,
-  );
-  const NotificationDetails platformChannelSpecifics =
+  AndroidNotificationDetails androidPlatformChannelSpecifics;
+
+  if (isDump) {
+    print('dump');
+    androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'notification.id', // Replace with a unique channel ID
+      'general', // Replace with a descriptive channel name
+      channelDescription: 'description',
+      //'Your channel description', // Replace with a descriptive channel description
+      priority: Priority.max,
+      enableVibration: true,
+      icon: 'ic_launcher',
+      importance: Importance.high,
+      ticker: 'ticker',
+      sound: RawResourceAndroidNotificationSound('dumpit'),
+      playSound: true,
+    );
+  } else {
+    print('pump');
+    androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'notification.id2', // Replace with a unique channel ID
+      'general2', // Replace with a descriptive channel name
+      channelDescription: 'description2',
+      //'Your channel description', // Replace with a descriptive channel description
+      priority: Priority.max,
+      enableVibration: true,
+      icon: 'ic_launcher',
+      importance: Importance.high,
+      ticker: 'ticker',
+      sound: RawResourceAndroidNotificationSound('pumpit'),
+      playSound: true,
+    );
+  }
+
+  final NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
 
   await flutterLocalNotificationsPlugin.show(
@@ -105,7 +125,6 @@ Future<void> showNotification(
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
   if (Platform.isIOS) {
     // Code for iOS
     print("Running on iOS");
@@ -152,7 +171,8 @@ void main() async {
             true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
         );
     Workmanager().registerPeriodicTask(
-      "com.yumiya.mytask", "this part to be ignored in ios", // Ignored on iOS
+      "com.yumiya.mytask",
+      "this part to be ignored in ios",
       frequency: Duration(minutes: 15),
     );
     // Code for Android
@@ -213,6 +233,11 @@ Future<void> fetchData() async {
     List names = jsonData.map((item) => item["name"]).toList();
     List lowerLimits = jsonData.map((item) => item["lowerLimit"]).toList();
     List higherLimits = jsonData.map((item) => item["higherLimit"]).toList();
+    List<int> dumped = [];
+    List<int> pumped = [];
+    String dumpedStr = "";
+    String pumpedStr = "";
+
     print(names);
     for (var i = 0; i < names.length; i++) {
       final response =
@@ -223,6 +248,25 @@ Future<void> fetchData() async {
         final jsonData = json.decode(response.body);
         // You can now work with jsonData, which contains the response data
         print(jsonData['current_value']);
+        try {
+          double currentValue = double.parse(jsonData['current_value']);
+          double floatLowerLimit = double.parse(lowerLimits[i]);
+          double floatHigherLimit = double.parse(higherLimits[i]);
+          if (currentValue >= floatHigherLimit) {
+            pumped.add(i);
+            pumpedStr += names[i];
+            pumpedStr += ' ';
+          }
+          if (currentValue <= floatLowerLimit) {
+            dumped.add(i);
+            dumpedStr += names[i];
+            dumpedStr += ' ';
+          }
+          // print(floatValue);
+        } catch (e) {
+          // Handle parsing errors, such as non-numeric input
+          print("Error parsing the string: $e");
+        }
         // showNotification('news', jsonData['current_value'], true);
       } else {
         // If the server did not return a 200 OK response,
@@ -230,6 +274,14 @@ Future<void> fetchData() async {
         throw Exception('Failed to load data');
       }
       await Future.delayed(Duration(seconds: 10));
+    }
+
+    if (dumpedStr.isNotEmpty) {
+      await showNotification('Dumped stocks:', dumpedStr, true);
+    }
+
+    if (pumpedStr.isNotEmpty) {
+      await showNotification('pumped stocks:', pumpedStr, false);
     }
   }
 }
