@@ -7,6 +7,7 @@ import 'dart:collection';
 class TaskData extends ChangeNotifier {
   List<Task> _tasks = [];
   int state = 0;
+  int item0 = -1;
   String item1 = '';
   String item2 = '';
   String item3 = '';
@@ -29,6 +30,7 @@ class TaskData extends ChangeNotifier {
       List names = jsonData.map((item) => item["name"]).toList();
       List lowerLimits = jsonData.map((item) => item["lowerLimit"]).toList();
       List higherLimits = jsonData.map((item) => item["higherLimit"]).toList();
+      List stockTypes = jsonData.map((item) => item["stockType"]).toList();
 
       // Create a list of Task objects by mapping the data
       List<Task> tasks = List.generate(names.length, (index) {
@@ -36,6 +38,7 @@ class TaskData extends ChangeNotifier {
           name: names[index],
           lowerLimit: lowerLimits[index],
           higherLimit: higherLimits[index],
+          stockType: stockTypes[index],
         );
       });
       _tasks.addAll(tasks);
@@ -70,12 +73,16 @@ class TaskData extends ChangeNotifier {
     _displayText = newTitle;
   }
 
-  void addTask(String newTaskTitle, String newLvalue, String newHvalue) {
+  void addTask(String newTaskTitle, String newLvalue, String newHvalue,
+      int stockTypeValue) {
     if (newTaskTitle == null) {
       print('String is null');
     } else {
       final task = Task(
-          name: newTaskTitle, lowerLimit: newLvalue, higherLimit: newHvalue);
+          name: newTaskTitle,
+          lowerLimit: newLvalue,
+          higherLimit: newHvalue,
+          stockType: stockTypeValue);
       _tasks.add(task);
       item1 = '';
       item2 = '';
@@ -88,6 +95,16 @@ class TaskData extends ChangeNotifier {
 
   void addState() {
     state += 1;
+    notifyListeners();
+  }
+
+  void typeCrypto() {
+    item0 = 0;
+    notifyListeners();
+  }
+
+  void typeStock() {
+    item0 = 1;
     notifyListeners();
   }
 

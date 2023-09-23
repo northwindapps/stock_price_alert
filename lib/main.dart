@@ -35,9 +35,7 @@ void callbackDispatcher() {
         break;
     }
     print("called");
-    // showNotification('hi', 'how are you?');
     bool success = true;
-    // await showNotification('hi', 'how are you?');
     await fetchData();
     return Future.value(success);
   });
@@ -82,7 +80,7 @@ Future<void> showNotification(
 
   if (isDump) {
     print('dump');
-    androidPlatformChannelSpecifics = AndroidNotificationDetails(
+    androidPlatformChannelSpecifics = const AndroidNotificationDetails(
       'notification.id', // Replace with a unique channel ID
       'general', // Replace with a descriptive channel name
       channelDescription: 'description',
@@ -97,7 +95,7 @@ Future<void> showNotification(
     );
   } else {
     print('pump');
-    androidPlatformChannelSpecifics = AndroidNotificationDetails(
+    androidPlatformChannelSpecifics = const AndroidNotificationDetails(
       'notification.id2', // Replace with a unique channel ID
       'general2', // Replace with a descriptive channel name
       channelDescription: 'description2',
@@ -168,7 +166,7 @@ void main() async {
     await Workmanager().initialize(
         callbackDispatcher, // The top level function, aka callbackDispatcher
         isInDebugMode:
-            true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+            false // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
         );
     Workmanager().registerPeriodicTask(
       "com.yumiya.mytask",
@@ -233,6 +231,7 @@ Future<void> fetchData() async {
     List names = jsonData.map((item) => item["name"]).toList();
     List lowerLimits = jsonData.map((item) => item["lowerLimit"]).toList();
     List higherLimits = jsonData.map((item) => item["higherLimit"]).toList();
+    List stockTypes = jsonData.map((item) => item["stockType"]).toList();
     List<int> dumped = [];
     List<int> pumped = [];
     String dumpedStr = "";
@@ -240,8 +239,16 @@ Future<void> fetchData() async {
 
     print(names);
     for (var i = 0; i < names.length; i++) {
-      final response =
-          await http.get(Uri.parse("${dotenv.env['API_URL']}${names[i]}"));
+      var response;
+      if (stockTypes[i] == 0) {
+        response =
+            await http.get(Uri.parse("${dotenv.env['API_URL']}${names[i]}"));
+        // await http.get(Uri.parse(
+      } else {
+        response =
+            await http.get(Uri.parse("${dotenv.env['API_URL']}${names[i]}"));
+        // await http.get(Uri.parse(
+      }
 
       if (response.statusCode == 200) {
         // If the server returns a 200 OK response, parse the JSON data
@@ -249,7 +256,10 @@ Future<void> fetchData() async {
         // You can now work with jsonData, which contains the response data
         print(jsonData['current_value']);
         try {
-          double currentValue = double.parse(jsonData['current_value']);
+          String valueWithCommas =
+              jsonData['current_value']; // Assuming this is your input string
+          String valueWithoutCommas = valueWithCommas.replaceAll(',', '');
+          double currentValue = double.parse(valueWithoutCommas);
           double floatLowerLimit = double.parse(lowerLimits[i]);
           double floatHigherLimit = double.parse(higherLimits[i]);
           if (currentValue >= floatHigherLimit) {

@@ -42,11 +42,11 @@ class TasksScreen extends StatelessWidget {
                     // This function will be executed when the CircleAvatar is tapped
                     print("CircleAvatar tapped");
                     // await fetchData();
-                    // await fetchData();
+                    await fetchData();
                     // await showNotification('hi', 'notificationBody', false);
-                    await showNotification('hi', 'notificationBody2', false);
-                    await Future.delayed(Duration(seconds: 10));
-                    await showNotification('hi', 'notificationBody2', true);
+                    // await showNotification('hi', 'notificationBody2', false);
+                    // await Future.delayed(Duration(seconds: 10));
+                    // await showNotification('hi', 'notificationBody2', true);
                   },
                   child: CircleAvatar(
                     child: Icon(

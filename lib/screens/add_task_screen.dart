@@ -14,6 +14,7 @@ class AddTaskScreen extends StatelessWidget {
     String? newTaskTitle;
     String? newTaskBody;
     String? newTaskBody2;
+    int? newTaskType;
 
     void clearTextField() {
       titleController.clear();
@@ -80,11 +81,12 @@ class AddTaskScreen extends StatelessWidget {
             Provider.of<TaskData>(context, listen: false).item3 = newTaskBody2!;
             clearTextField();
 
+            newTaskType = Provider.of<TaskData>(context, listen: false).item0;
             newTaskTitle = Provider.of<TaskData>(context, listen: false).item1;
             newTaskBody = Provider.of<TaskData>(context, listen: false).item2;
             newTaskBody2 = Provider.of<TaskData>(context, listen: false).item3;
-            Provider.of<TaskData>(context, listen: false)
-                .addTask(newTaskTitle!, newTaskBody!, newTaskBody2!);
+            Provider.of<TaskData>(context, listen: false).addTask(
+                newTaskTitle!, newTaskBody!, newTaskBody2!, newTaskType!);
 
             Provider.of<TaskData>(context, listen: false).saveTasksToStorage();
             Navigator.pop(context);
@@ -140,6 +142,8 @@ class AddTaskScreen extends StatelessWidget {
                           Provider.of<TaskData>(context, listen: false)
                               .addState();
                           Provider.of<TaskData>(context, listen: false)
+                              .typeCrypto();
+                          Provider.of<TaskData>(context, listen: false)
                               .setTitle('Enter a crypto symbol.');
                         },
                       ),
@@ -150,6 +154,8 @@ class AddTaskScreen extends StatelessWidget {
                         onChanged: (value) {
                           Provider.of<TaskData>(context, listen: false)
                               .addState();
+                          Provider.of<TaskData>(context, listen: false)
+                              .typeStock();
                           Provider.of<TaskData>(context, listen: false)
                               .setTitle('Enter a stock symbol.');
                         },
