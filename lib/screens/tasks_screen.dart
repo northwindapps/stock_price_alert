@@ -36,28 +36,28 @@ class TasksScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                GestureDetector(
-                  onTap: () async {
-                    // Your onPressed action code goes here
-                    // This function will be executed when the CircleAvatar is tapped
-                    print("CircleAvatar tapped");
-                    // await fetchData();
-                    await fetchData();
-                    // await showNotification('hi', 'notificationBody', false);
-                    // await showNotification('hi', 'notificationBody2', false);
-                    // await Future.delayed(Duration(seconds: 10));
-                    // await showNotification('hi', 'notificationBody2', true);
-                  },
-                  child: CircleAvatar(
-                    child: Icon(
-                      Icons.list,
-                      size: 20.0,
-                      color: Colors.lightBlueAccent,
-                    ),
-                    backgroundColor: Colors.white,
-                    radius: 30.0,
-                  ),
-                ),
+                // GestureDetector(
+                //   onTap: () async {
+                //     // Your onPressed action code goes here
+                //     // This function will be executed when the CircleAvatar is tapped
+                //     print("CircleAvatar tapped");
+                //     // await fetchData();
+                //     await fetchData();
+                //     // await showNotification('hi', 'notificationBody', false);
+                //     // await showNotification('hi', 'notificationBody2', false);
+                //     // await Future.delayed(Duration(seconds: 10));
+                //     // await showNotification('hi', 'notificationBody2', true);
+                //   },
+                //   child: CircleAvatar(
+                //     child: Icon(
+                //       Icons.list,
+                //       size: 20.0,
+                //       color: Colors.lightBlueAccent,
+                //     ),
+                //     backgroundColor: Colors.white,
+                //     radius: 30.0,
+                //   ),
+                // ),
                 SizedBox(
                   height: 10.0,
                 ),

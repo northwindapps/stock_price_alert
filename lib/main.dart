@@ -1,13 +1,12 @@
 import 'dart:convert';
-import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'firebase_options.dart';
 import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:background_fetch/background_fetch.dart';
 import 'package:http/http.dart' as http;
 import 'package:stock_price_checker_app/screens/tasks_screen.dart';
 import 'package:provider/provider.dart';
@@ -15,18 +14,19 @@ import 'package:stock_price_checker_app/models/task_data.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'models/task.dart';
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
-  await Firebase.initializeApp();
-  await showNotification('hi', 'how are you?', true);
-  fetchData();
-  print("Handling a background message: ${message.messageId}");
-}
+// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+//   // If you're going to use other Firebase services in the background, such as Firestore,
+//   // make sure you call `initializeApp` before using other Firebase services.
+//   await Firebase.initializeApp();
+//   await showNotification('hi', 'how are you?', true);
+//   fetchData();
+//   print("Handling a background message: ${message.messageId}");
+// }
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
+@pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     switch (task) {
@@ -125,43 +125,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isIOS) {
     // Code for iOS
-    print("Running on iOS");
-    await initNotifications();
-    // Step 1:  Configure BackgroundFetch as usual.
-    int status = await BackgroundFetch.configure(
-        BackgroundFetchConfig(
-          minimumFetchInterval: 15,
-          stopOnTerminate:
-              false, // Continue running background tasks even if the app is terminated
-          enableHeadless: true, // Enable headless mode
-          startOnBoot: true, // Start background fetch on device boot
-        ), (String taskId) async {
-      // <-- Event callback.
-      // This is the fetch-event callback.
-      print("[BackgroundFetch] taskId: $taskId");
-
-      // Use a switch statement to route task-handling.
-      switch (taskId) {
-        case 'com.yumiya.mytask':
-          print("Received custom task");
-          showNotification('hi', 'how are you?', false);
-          break;
-        default:
-          print("Default fetch task");
-      }
-      // Finish, providing received taskId.
-      BackgroundFetch.finish(taskId);
-    }, (String taskId) async {
-      // <-- Event timeout callback
-      // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)
-      print("[BackgroundFetch] TIMEOUT taskId: $taskId");
-      BackgroundFetch.finish(taskId);
-    });
-
-    // Step 2:  Schedule a custom "oneshot" task "com.transistorsoft.customtask" to execute 5000ms from now.
-    BackgroundFetch.scheduleTask(
-        TaskConfig(taskId: "com.yumiya.mytask", delay: 5000 // <-- milliseconds
-            ));
   } else if (Platform.isAndroid) {
     await Workmanager().initialize(
         callbackDispatcher, // The top level function, aka callbackDispatcher
@@ -181,41 +144,41 @@ void main() async {
   }
 
   //make sure you turned on wifi connection
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  FirebaseMessaging.instance.requestPermission();
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-  final fcmToken = await FirebaseMessaging.instance.getToken();
-  print(fcmToken);
-  NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
+  // FirebaseMessaging.instance.requestPermission();
+  // FirebaseMessaging messaging = FirebaseMessaging.instance;
+  // final fcmToken = await FirebaseMessaging.instance.getToken();
+  // print(fcmToken);
+  // NotificationSettings settings = await messaging.requestPermission(
+  //   alert: true,
+  //   announcement: false,
+  //   badge: true,
+  //   carPlay: false,
+  //   criticalAlert: false,
+  //   provisional: false,
+  //   sound: true,
+  // );
 
-  print('User granted permission: ${settings.authorizationStatus}');
+  // print('User granted permission: ${settings.authorizationStatus}');
   // await FirebaseMessaging.instance.setAutoInitEnabled(true);
   // final fcmToken = await FirebaseMessaging.instance.getToken();
   // print(fcmToken);
 
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('Got a message whilst in the foreground!');
-    print('Message data: ${message.data}');
+  // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  //   print('Got a message whilst in the foreground!');
+  //   print('Message data: ${message.data}');
 
-    if (message.notification != null) {
-      print('Message also contained a notification: ${message.notification}');
-    }
+  //   if (message.notification != null) {
+  //     print('Message also contained a notification: ${message.notification}');
+  //   }
 
-    showNotification('hi', 'how are you?', false);
-    fetchData();
-  });
+  //   showNotification('hi', 'how are you?', false);
+  //   fetchData();
+  // });
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(MyApp());
 }
 
@@ -241,12 +204,10 @@ Future<void> fetchData() async {
     for (var i = 0; i < names.length; i++) {
       var response;
       if (stockTypes[i] == 0) {
-        response =
-            await http.get(Uri.parse("${dotenv.env['API_URL']}${names[i]}"));
+        response = await http.get(Uri.parse("${names[i]}"));
         // await http.get(Uri.parse(
       } else {
-        response =
-            await http.get(Uri.parse("${dotenv.env['API_URL']}${names[i]}"));
+        response = await http.get(Uri.parse("${names[i]}"));
         // await http.get(Uri.parse(
       }
 
@@ -290,6 +251,8 @@ Future<void> fetchData() async {
       await showNotification('Dumped stocks:', dumpedStr, true);
     }
 
+    await Future.delayed(Duration(seconds: 10));
+
     if (pumpedStr.isNotEmpty) {
       await showNotification('pumped stocks:', pumpedStr, false);
     }
@@ -302,6 +265,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => TaskData(),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: TasksScreen(),
       ),
     );
